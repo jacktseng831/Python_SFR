@@ -1,0 +1,99 @@
+#:import Gradient main.Gradient
+#:import os os
+#:import pathlib pathlib
+<Workspace>:
+	canvas:
+		Rectangle:
+			size: self.size
+			texture: Gradient.vertical((.1,.1,.1,1),(.25,.25,.25,1))
+	Label:
+		text: 'Click to load an image file'
+		font_size: '24sp'
+
+<LoadDialog>:
+	BoxLayout:
+		size: root.size
+		pos: root.pos
+		orientation: "horizontal"
+
+		Splitter:
+			sizable_from: 'right'
+			max_size: root.width - self.min_size
+
+			FileChooserIconView:
+				id: filechooser
+				path: str(pathlib.Path.home())
+				filters: ['*.png','*.jpg','*.bmp']
+				on_selection: if len(filechooser.selection) > 0: root.update(os.path.join(filechooser.path, filechooser.selection[0]), image)
+				on_entry_added: root.update(os.path.join(filechooser.path, filechooser.selection[0]), image) if len(filechooser.selection) > 0 else root.update(filechooser.path, image)
+
+
+		BoxLayout:
+			pos: root.pos
+			orientation: "vertical"
+
+			Image:
+				id: image
+				size_hint: 1, 1
+				color: 0,0,0,0
+
+			BoxLayout:
+				size_hint_y: None
+				height: 30
+				Button:
+					text: "Cancel"
+					on_release: root.cancel()
+
+				Button:
+					text: "Load"
+					on_release: if len(filechooser.selection) > 0: root.load(os.path.join(filechooser.path, filechooser.selection[0]))
+
+<RoiSelector>:
+	size_hint: 1, 1
+
+	image: image
+
+	Image:
+		id: image
+		allow_stretch: True
+		source: root.source
+
+<MessageBox>:
+	size_hint: None, None
+	arrow_pos: 'bottom_left'
+
+	BoxLayout:
+		orientation: "vertical"
+
+		Label:
+			id: label
+			text_size: root.width, None
+			text: root.message
+			bold: True
+			halign: 'center'
+			valign: 'middle'
+			size: self.texture_size
+
+		BoxLayout:
+			orientation: "horizontal"
+
+			BubbleButton:
+				text: 'Yes'
+				bold: True
+				on_release: root.load()
+			BubbleButton:
+				text: 'No'
+				bold: True
+				on_release: root.cancel()
+
+<Toast>:
+	arrow_pos: 'bottom_mid'
+	size_hint: None, None
+
+	Label:
+		text_size: root.width, None
+		size: self.texture_size
+		text: root.message
+		bold: True
+		halign: 'center'
+		valign: 'middle'
