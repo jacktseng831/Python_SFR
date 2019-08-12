@@ -64,10 +64,10 @@ class LoadDialog(FloatLayout):
 
     def __init__(self, **kwargs):
         super(LoadDialog, self).__init__(**kwargs)
-		# Special process for Windows
+        # Special process for Windows
         if platform == 'win':
             import win32api
-
+            self.ids.spinner.opacity = 1
             self.ids.spinner.size_hint_max_y = 30
             self.ids.spinner.values = win32api.GetLogicalDriveStrings().split('\000')[:-1]
             self.ids.spinner.values.append(str(pathlib.Path.home()))
