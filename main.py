@@ -4,6 +4,7 @@ from functools import partial
 from itertools import chain
 import math
 import os
+import pathlib
 from random import random
 
 # disable multi-touch emulation
@@ -25,6 +26,8 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.scatter import Scatter
+from kivy.utils import platform
+
 
 import numpy
 
@@ -52,6 +55,20 @@ class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
     cancel = ObjectProperty(None)
     update = ObjectProperty(None)
+
+    def __init__(self, **kwargs):
+        super(LoadDialog, self).__init__(**kwargs)
+		# Special process for Windows
+        if platform == 'win':
+            import win32api
+
+            self.ids.spinner.size_hint_max_y = 30
+            self.ids.spinner.values = win32api.GetLogicalDriveStrings().split('\000')[:-1]
+            self.ids.spinner.values.append(str(pathlib.Path.home()))
+            self.ids.spinner.text = self.ids.spinner.values[-1]
+            def change_drive(spinner, text):
+                self.ids.filechooser.path = text
+            self.ids.spinner.bind(text=change_drive)
 
 class MessageBox(Bubble):
     load = ObjectProperty(None)
@@ -489,7 +506,20 @@ class SfrViewer(FloatLayout):
 
             Color(rgba=self.colors[self.channel][0])
             Line(points=shapes[self.channel][0], width=2)
-            label = CoreLabel(text='MTF50 = {0:0.3f} Cy/pxl = {1:0.0f} LW/PH\nMTF50P = {4:0.3f} Cy/pxl = {5:0.0f} LW/PH\n\nMTF50(corr) = {2:0.3f} Cy/pxl = {3:0.0f} LW/PH\n{6:s} = {7:0.1f} %'.format(self.sfr_dict['Channels'][self.channel]['MTF50'],self.sfr_dict['Channels'][self.channel]['MTF50']*self.sfr_dict['Size'][0 if self.sfr_dict['Orientation'] == 'Horizontal' else 1]*2,self.sfr_dict['Channels'][self.channel]['Corrected MTF50'],self.sfr_dict['Channels'][self.channel]['Corrected MTF50']*self.sfr_dict['Size'][0 if self.sfr_dict['Orientation'] == 'Horizontal' else 1]*2,self.sfr_dict['Channels'][self.channel]['MTF50P'],self.sfr_dict['Channels'][self.channel]['MTF50P']*self.sfr_dict['Size'][0 if self.sfr_dict['Orientation'] == 'Horizontal' else 1]*2,'Undersharpening' if self.sfr_dict['Channels'][self.channel]['Sharpening'] < 0 else 'Oversharpening', abs(self.sfr_dict['Channels'][self.channel]['Sharpening'])*100), font_size=18, halign='right', color=(1, 1, 1, 1))
+            label = CoreLabel(text='''[{8:s} Channel]    MTF50 = {0:0.3f} Cy/pxl = {1:0.0f} LW/PH
+MTF50P = {4:0.3f} Cy/pxl = {5:0.0f} LW/PH
+
+MTF50(corr) = {2:0.3f} Cy/pxl = {3:0.0f} LW/PH
+{6:s} = {7:0.1f} %'''.format(self.sfr_dict['Channels'][self.channel]['MTF50'],
+                    self.sfr_dict['Channels'][self.channel]['MTF50']*self.sfr_dict['Size'][0 if self.sfr_dict['Orientation'] == 'Horizontal' else 1]*2,
+                    self.sfr_dict['Channels'][self.channel]['Corrected MTF50'],
+                    self.sfr_dict['Channels'][self.channel]['Corrected MTF50']*self.sfr_dict['Size'][0 if self.sfr_dict['Orientation'] == 'Horizontal' else 1]*2,
+                    self.sfr_dict['Channels'][self.channel]['MTF50P'],
+                    self.sfr_dict['Channels'][self.channel]['MTF50P']*self.sfr_dict['Size'][0 if self.sfr_dict['Orientation'] == 'Horizontal' else 1]*2,
+                    'Undersharpening' if self.sfr_dict['Channels'][self.channel]['Sharpening'] < 0 else 'Oversharpening',
+                    abs(self.sfr_dict['Channels'][self.channel]['Sharpening'])*100,
+                    self.channel),
+                font_size=18, halign='right', color=(1, 1, 1, 1))
             label.refresh()
             Rectangle(texture=label.texture, pos=(chart_pos[0]+chart_size[0]-label.texture.size[0]-10,chart_pos[1]+chart_size[1]-label.texture.size[1]-10), size=label.texture.size)
 

@@ -1,6 +1,9 @@
 #:import Gradient main.Gradient
 #:import os os
 #:import pathlib pathlib
+<Widget>:
+	font_name: 'TaipeiSansTCBeta-Regular.ttf'
+
 <Workspace>:
 	canvas:
 		Rectangle:
@@ -20,16 +23,22 @@
 			sizable_from: 'right'
 			max_size: root.width - self.min_size
 
-			FileChooserIconView:
-				id: filechooser
-				path: str(pathlib.Path.home())
-				filters: ['*.png','*.jpg','*.bmp']
-				on_selection: if len(filechooser.selection) > 0: root.update(os.path.join(filechooser.path, filechooser.selection[0]), image)
-				on_entry_added: root.update(os.path.join(filechooser.path, filechooser.selection[0]), image) if len(filechooser.selection) > 0 else root.update(filechooser.path, image)
+			BoxLayout:
+				orientation: "vertical"
+
+				Spinner:
+				    id: spinner
+					size_hint_max_y: 0
+
+				FileChooserIconView:
+					id: filechooser
+					path: str(pathlib.Path.home())
+					filters: ['*.png','*.jpg','*.bmp']
+					on_selection: if len(filechooser.selection) > 0: root.update(os.path.join(filechooser.path, filechooser.selection[0]), image)
+					on_entry_added: root.update(os.path.join(filechooser.path, filechooser.selection[0]), image) if len(filechooser.selection) > 0 else root.update(filechooser.path, image)
 
 
 		BoxLayout:
-			pos: root.pos
 			orientation: "vertical"
 
 			Image:
