@@ -1,5 +1,11 @@
 __version__ = '1.0'
 
+# workaround for pyinstaller packing, disabled by default
+#import numpy.random.common
+#import numpy.random.bounded_integers
+#import numpy.random.entropy
+#import win32timezone
+
 from functools import partial
 from itertools import chain
 import math
