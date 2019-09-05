@@ -7,6 +7,7 @@ This is a simple project written in Python to allow user using python to get the
   - [Python](https://www.python.org/downloads/)
   - [kivy](https://kivy.org/#download)
   - [SciPy](https://www.scipy.org/install.html)
+  - [Pillow](https://pypi.org/project/Pillow/)
 
 ## How to use
 
